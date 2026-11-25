@@ -1,13 +1,103 @@
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cartes mentales – HG</title>
-<style>body{font-family:system-ui,sans-serif;max-width:700px;margin:40px auto;padding:0 16px;color:#222}
-a{display:block;padding:14px 16px;margin:10px 0;background:#1f2a44;color:#fff;border-radius:12px;text-decoration:none;font-weight:600}
-a small{display:block;font-weight:400;opacity:.8}</style></head>
-<body><h1>🧠 Cartes mentales</h1>
-<a href="3e-G1.html">Les dynamiques des aires urbaines<small>3e-G1</small></a>
-<a href="3e-H1-DNB.html">Civils et militaires dans la Grande Guerre<small>3e-H1-DNB</small></a>
-<a href="3e-H1.html">La Première Guerre mondiale<small>3e-H1</small></a>
-<a href="3e-H2a.html">Les expériences totalitaires<small>3e-H2a</small></a>
-<a href="3e-H2b.html">La France des années 1930<small>3e-H2b</small></a>
-</body></html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartes mentales – Histoire-Géographie-EMC</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #f6f4ef; color: #222; }
+  header { background: #1f2a44; color: #fff; padding: 22px 16px 16px; }
+  .contenu { max-width: 860px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 26px; }
+  header p { margin: 6px 0 0; opacity: .85; font-size: 14.5px; }
+  .niveaux { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .niveaux button { font: inherit; font-weight: 700; font-size: 15px; border: 2px solid rgba(255,255,255,.5); background: transparent;
+                    color: #fff; padding: 6px 16px; border-radius: 999px; cursor: pointer; }
+  .niveaux button.actif { background: #fff; color: #1f2a44; border-color: #fff; }
+  main { padding: 8px 16px 40px; }
+  .matiere { margin-top: 22px; }
+  .matiere h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: 20px; color: var(--c); }
+  .matiere h2::before { content: ""; width: 8px; height: 26px; border-radius: 4px; background: var(--c); }
+  .chapitre { background: #fff; border-radius: 14px; border-left: 7px solid var(--c); padding: 12px 14px; margin-bottom: 10px;
+              box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .chapitre h3 { margin: 0 0 8px; font-size: 16.5px; }
+  .chapitre h3 small { display: block; font-weight: 600; font-size: 12.5px; color: var(--c); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .cartes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cartes a { display: flex; align-items: center; gap: 8px; background: var(--c); color: #fff; text-decoration: none; font-weight: 600;
+              padding: 9px 14px; border-radius: 10px; font-size: 14.5px; }
+  .cartes a:hover { filter: brightness(1.1); }
+  .cartes a .etiquette { background: rgba(255,255,255,.25); border-radius: 6px; padding: 1px 7px; font-size: 11.5px; font-weight: 700; }
+  .vide { color: #888; font-style: italic; font-size: 14px; padding: 4px 2px; }
+  footer { text-align: center; color: #888; font-size: 12.5px; padding: 20px; }
+</style>
+</head>
+<body>
+<header><div class="contenu">
+  <h1>🧠 Cartes mentales</h1>
+  <p>Écris tout ce que tu sais, range tes idées, relie-les : révise ton cours d'histoire, de géographie et d'EMC.</p>
+  <div class="niveaux" id="niveaux"></div>
+</div></header>
+<main class="contenu" id="liste"></main>
+<footer>M. Labbé · Histoire-Géographie-EMC</footer>
+
+<script>
+/* =====================================================================
+   LISTE DES CARTES — la seule partie à modifier.
+   Pour ajouter une carte : copier une ligne { ... } et changer les valeurs.
+   - niveau  : "6e", "5e", "4e" ou "3e"
+   - matiere : "Histoire", "Géographie" ou "EMC"
+   - chapitre : numéro et titre du chapitre (les cartes d'un même chapitre sont regroupées)
+   - titre   : nom du bouton ; etiquette (facultatif) : petit mot à côté (ex. "DNB")
+   - page    : nom de la page de la carte (ex. "3e-H1.html")
+   ===================================================================== */
+const CARTES = [
+  { niveau: "3e", matiere: "Histoire", chapitre: "Chapitre 1 – Civils et militaires dans la Première Guerre mondiale",
+    titre: "Carte générale", page: "3e-H1.html" },
+  { niveau: "3e", matiere: "Histoire", chapitre: "Chapitre 1 – Civils et militaires dans la Première Guerre mondiale",
+    titre: "Violences de masse et guerre totale", etiquette: "DNB", page: "3e-H1-DNB.html" },
+  { niveau: "3e", matiere: "Histoire", chapitre: "Chapitre 2 – Démocraties fragilisées et expériences totalitaires",
+    titre: "Les régimes totalitaires", page: "3e-H2a.html" },
+  { niveau: "3e", matiere: "Histoire", chapitre: "Chapitre 2 – Démocraties fragilisées et expériences totalitaires",
+    titre: "La France des années 1930", page: "3e-H2b.html" },
+  { niveau: "3e", matiere: "Géographie", chapitre: "Chapitre 1 – Les dynamiques des aires urbaines",
+    titre: "Les aires urbaines", page: "3e-G1.html" }
+];
+
+/* Code couleur des matières */
+const MATIERES = [
+  { nom: "Histoire", icone: "📜", couleur: "#d9640f" },
+  { nom: "Géographie", icone: "🌍", couleur: "#2e7d32" },
+  { nom: "EMC", icone: "⚖️", couleur: "#1565c0" }
+];
+
+/* ===================================================================== */
+const ORDRE = ["6e", "5e", "4e", "3e"];
+const niveaux = ORDRE.filter(n => CARTES.some(c => c.niveau === n));
+let niveau = new URLSearchParams(location.search).get("niveau") || niveaux[niveaux.length - 1];
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function afficher() {
+  document.getElementById("niveaux").innerHTML = niveaux.map(n =>
+    `<button class="${n === niveau ? "actif" : ""}" data-n="${n}">${n}</button>`).join("");
+  document.querySelectorAll("#niveaux button").forEach(b => b.onclick = () => { niveau = b.dataset.n; afficher(); });
+  let h = "";
+  MATIERES.forEach(m => {
+    const cartes = CARTES.filter(c => c.niveau === niveau && c.matiere === m.nom);
+    h += `<section class="matiere" style="--c:${m.couleur}"><h2>${m.icone} ${m.nom}</h2>`;
+    if (!cartes.length) h += `<div class="chapitre"><div class="vide">Bientôt…</div></div>`;
+    const chapitres = [...new Set(cartes.map(c => c.chapitre))];
+    chapitres.forEach(ch => {
+      const [num, ...reste] = ch.split(" – ");
+      h += `<div class="chapitre"><h3>${reste.length ? `<small>${esc(num)}</small>${esc(reste.join(" – "))}` : esc(ch)}</h3><div class="cartes">` +
+        cartes.filter(c => c.chapitre === ch).map(c =>
+          `<a href="${esc(c.page)}">🧠 ${esc(c.titre)}${c.etiquette ? ` <span class="etiquette">${esc(c.etiquette)}</span>` : ""}</a>`).join("") +
+        `</div></div>`;
+    });
+    h += `</section>`;
+  });
+  document.getElementById("liste").innerHTML = h;
+}
+afficher();
+</script>
+</body>
+</html>
